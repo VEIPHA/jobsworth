@@ -14,5 +14,9 @@ python -m src.scraper
 
 ## License
 
-This project is open source under the MIT License.
-You’re free to use, modify, and distribute it — just keep the original license and credit intact.
+You are free to use and modify this project for personal or commercial use,  
+**but credit must be given to Veipha** in any derivative or distributed version.
+
+Do not remove or alter this notice in any copies or substantial portions of the code.
+
+Veipha. All rights reserved.
