@@ -10,21 +10,26 @@ def get_credentials_from_env():
     return json.loads(credentials_json)
 
 def write_jobs_to_sheet(jobs, sheet_name, tab_name):
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds_dict = get_credentials_from_env()
-    import os
-    import json
+    scope = [
+        "https://spreadsheets.google.com/feeds",
+        "https://www.googleapis.com/auth/drive"
+    ]
 
-    raw_json = os.environ.get("GCP_CREDENTIALS_JSON")
-    creds_data = json.loads(raw_json)
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_data, scope)
+    creds_dict = get_credentials_from_env()
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     client = gspread.authorize(creds)
 
     sheet = client.open(sheet_name).worksheet(tab_name)
-    header = list(jobs[0].keys()) if jobs else []
-    rows = [list(job.values()) for job in jobs]
 
+    # Clear the sheet first
     sheet.clear()
-    sheet.append_row(header)
-    for row in rows:
-        sheet.append_row(row)
+
+    # Write header and rows
+    if jobs:
+        header = list(jobs[0].keys())
+        rows = [list(job.values()) for job in jobs]
+
+        sheet.append_row(header)
+        sheet.append_rows(rows, value_input_option="USER_ENTERED")
+
+    print(f"[INFO] Wrote {len(jobs)} jobs to Google Sheet.")
