@@ -12,7 +12,12 @@ def get_credentials_from_env():
 def write_jobs_to_sheet(jobs, sheet_name, tab_name):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds_dict = get_credentials_from_env()
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+    import os
+    import json
+
+    raw_json = os.environ.get("GCP_CREDENTIALS_JSON")
+    creds_data = json.loads(raw_json)
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_data, scope)
     client = gspread.authorize(creds)
 
     sheet = client.open(sheet_name).worksheet(tab_name)
