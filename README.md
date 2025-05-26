@@ -1,33 +1,16 @@
 # Jobsworth
 
-Scrapes job posts from remote job boards and writes them to a Google Sheet.
+Jobsworth is a modular job scraping pipeline that pulls listings from varoous job boards, standardises them, and appends the data to Google Sheets. It then eriches them, and configuires them in a vector database. All this to make a very intelligent source of truth for all the jobs on earth, with support for semantic search, and AI tooling. API coming soon. 
 
 ## Setup
 
 1. Clone the repo  
 2. Add your Google credentials JSON as `creds/gsheets-creds.json`  
-3. Install dependencies:
-
-```bash
-pip install -r requirements.txt
+3. Install dependencies
 
 ## Run
 
 python -m src.scraper
-
-## Structure
-
-jobsworth/
-├── creds/
-│   └── gsheets-creds.json
-├── src/
-│   ├── boards/
-│   │   ├── fractionaljobs.py
-│   │   └── weworkremotely.py
-│   ├── google_sheets.py
-│   └── scraper.py
-├── requirements.txt
-└── README.md
 
 ## License
 
