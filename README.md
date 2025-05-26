@@ -1,32 +1,35 @@
 # Jobsworth
 
-Jobsworth is a lightweight, AI-powered job aggregator. It scrapes remote/flexible job listings from multiple public sources, cleans and enriches the data, and publishes it to a Google Sheet. Future phases include semantic search, a UI, and a public API.
+Scrapes job posts from remote job boards and writes them to a Google Sheet.
 
----
+## Setup
 
-## 🛠 Features
+1. Clone the repo  
+2. Add your Google credentials JSON as `creds/gsheets-creds.json`  
+3. Install dependencies:
 
-- Scrapes jobs from FractionalJobs.io and WeWorkRemotely (more to come)
-- Cleans and standardises job data
-- Writes jobs to a Google Sheet via service account
-- Modular agent-based architecture (planned)
+```bash
+pip install -r requirements.txt
 
----
+## Run
 
-## 📦 Requirements
+python -m src.scraper
 
-- Python 3.9+
-- `gspread`
-- `oauth2client`
-- `beautifulsoup4`
-- `requests`
-- Google Service Account credentials (JSON)
+## Structure
 
----
+jobsworth/
+├── creds/
+│   └── gsheets-creds.json
+├── src/
+│   ├── boards/
+│   │   ├── fractionaljobs.py
+│   │   └── weworkremotely.py
+│   ├── google_sheets.py
+│   └── scraper.py
+├── requirements.txt
+└── README.md
 
-## 🚀 Quick Start
+## License
 
-1. Clone the repo:
-   ```bash
-   git clone https://github.com/VEIPHA/jobsworth.git
-   cd jobsworth
+This project is open source under the MIT License.
+You’re free to use, modify, and distribute it — just keep the original license and credit intact.
