@@ -1,35 +1,35 @@
 import os
-import json
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-def get_credentials_from_env():
-    credentials_json = os.getenv("GCP_CREDENTIALS_JSON")
-    if not credentials_json:
-        raise ValueError("Missing GCP_CREDENTIALS_JSON environment variable")
-    return json.loads(credentials_json)
-
 def write_jobs_to_sheet(jobs, sheet_name, tab_name):
-    scope = [
-        "https://spreadsheets.google.com/feeds",
-        "https://www.googleapis.com/auth/drive"
-    ]
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
-    creds_dict = get_credentials_from_env()
+    # Load secret parts from env vars
+    private_key = os.getenv("GCP_PRIVATE_KEY").replace("\\n", "\n")
+    
+    creds_dict = {
+        "type": "service_account",
+        "project_id": "jobscraper-460818",
+        "private_key_id": "d3651a17fbe96911eea0b644860e70fec9e0ff6b",
+        "private_key": private_key,
+        "client_email": "jobscraper@jobscraper-460818.iam.gserviceaccount.com",
+        "client_id": "103019541166983160511",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/jobscraper@jobscraper-460818.iam.gserviceaccount.com",
+        "universe_domain": "googleapis.com"
+    }
+
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     client = gspread.authorize(creds)
 
     sheet = client.open(sheet_name).worksheet(tab_name)
+    header = list(jobs[0].keys()) if jobs else []
+    rows = [list(job.values()) for job in jobs]
 
-    # Clear the sheet first
     sheet.clear()
-
-    # Write header and rows
-    if jobs:
-        header = list(jobs[0].keys())
-        rows = [list(job.values()) for job in jobs]
-
-        sheet.append_row(header)
-        sheet.append_rows(rows, value_input_option="USER_ENTERED")
-
-    print(f"[INFO] Wrote {len(jobs)} jobs to Google Sheet.")
+    sheet.append_row(header)
+    for row in rows:
+        sheet.append_row(row)
