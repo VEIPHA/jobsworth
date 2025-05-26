@@ -1,6 +1,6 @@
 # Jobsworth
 
-Jobsworth is a modular job scraping pipeline that pulls listings from varoous job boards, standardises them, eriches them, and configuires them in a vector database. All this to make a very intelligent source of truth for all the jobs on earth, with support for semantic search, and AI tooling. API coming soon. 
+Jobsworth is a modular job scraping pipeline that pulls listings from various job boards, standardises them, eriches them, and configuires them in a vector database. All this to make a very intelligent source of truth for all the jobs on earth, with support for semantic search, and AI tooling. API coming soon. 
 
 ## Setup
 
