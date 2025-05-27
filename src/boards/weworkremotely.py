@@ -1,4 +1,4 @@
-from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
+from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 
 def scrape_wwr():
@@ -10,14 +10,22 @@ def scrape_wwr():
             headless=True,
             args=["--no-sandbox", "--disable-setuid-sandbox"]
         )
-        page = browser.new_page()
+
+        context = browser.new_context(user_agent=(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/91.0.4472.124 Safari/537.36"
+        ))
+
+        page = context.new_page()
         print("[WWR] Navigating to page...")
         page.goto("https://weworkremotely.com/", timeout=60000)
 
         try:
             page.wait_for_selector("li.new-listing-container", timeout=10000)
-        except PlaywrightTimeout:
-            print("[WWR] Timeout waiting for job listings. Dumping partial HTML...")
+        except Exception as e:
+            print(f"[WWR] Timeout waiting for job listings: {e}")
+            print("[WWR] Dumping first 2000 characters of HTML...")
             print(page.content()[:2000])
             browser.close()
             return []
