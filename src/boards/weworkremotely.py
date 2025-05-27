@@ -7,15 +7,16 @@ def scrape_wwr():
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
+        context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+        page = context.new_page()
         print("[WWR] Navigating to page...")
         page.goto("https://weworkremotely.com/", timeout=60000)
-        page.wait_for_timeout(3000)  # let content load
+        page.wait_for_selector("section.jobs", timeout=10000)
         html = page.content()
         browser.close()
 
     soup = BeautifulSoup(html, "html.parser")
-    sections = soup.select("section.jobs")  # each job category section
+    sections = soup.select("section.jobs")
 
     print(f"[WWR] Found {len(sections)} job sections")
 
@@ -23,7 +24,7 @@ def scrape_wwr():
         category = section.select_one("h2")
         category_name = category.text.strip() if category else "Unknown"
 
-        listings = section.select("li:not(.view-all)")  # skip 'view all' link
+        listings = section.select("li:not(.view-all)")  # skip 'view all' links
         print(f"[WWR] Found {len(listings)} listings in category '{category_name}'")
 
         for li in listings:
@@ -48,7 +49,6 @@ def scrape_wwr():
                     "source": "weworkremotely",
                     "category": category_name
                 })
-
             except Exception as e:
                 print(f"[WWR] Error parsing listing: {e}")
                 continue
