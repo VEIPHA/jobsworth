@@ -6,18 +6,14 @@ def scrape_wwr():
     jobs = []
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)  # Set to False temporarily for debugging
-        context = browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-            viewport={'width': 1280, 'height': 800},
-            locale='en-US'
+        browser = p.chromium.launch(
+            headless=True,
+            args=["--no-sandbox", "--disable-setuid-sandbox"]
         )
-        page = context.new_page()
+        page = browser.new_page()
         print("[WWR] Navigating to page...")
         page.goto("https://weworkremotely.com/", timeout=60000)
-
-        # Cloudflare may take 3-5 seconds to clear challenge
-        page.wait_for_timeout(7000)
+        page.wait_for_timeout(3000)
         html = page.content()
         browser.close()
 
