@@ -1,6 +1,3 @@
-import requests
-from bs4 import BeautifulSoup
-
 def grab_fractional_description(job_url: str) -> str:
     try:
         headers = {
@@ -14,8 +11,8 @@ def grab_fractional_description(job_url: str) -> str:
 
         soup = BeautifulSoup(response.text, "html.parser")
 
-        # Adjust the selector if this doesn't return enough
-        desc_container = soup.select_one(".job-item_details")
+        # Try inspecting the real description container
+        desc_container = soup.select_one("div[data-controller='job-description']")
         if not desc_container:
             print(f"[DESC] No job description found at {job_url}")
             return ""
