@@ -23,6 +23,6 @@ def write_jobs_to_sheet(jobs, sheet_name, tab_name):
     rows = [list(job.values()) for job in jobs]
 
     sheet.clear()
-    sheet.append_row(header)
+    sheet.append_rows([header] + rows, value_input_option="USER_ENTERED")
     for row in rows:
         sheet.append_row(row)
