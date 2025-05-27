@@ -1,3 +1,4 @@
 requests
 gspread
 oauth2client
+beautifulsoup4
