@@ -1,9 +1,8 @@
 import os
 import json
 import gspread
-import requests
-from bs4 import BeautifulSoup
 from oauth2client.service_account import ServiceAccountCredentials
+from src.grabbers.fractionaljobs_grabber import grab_fractional_description
 
 # === AUTH ===
 def get_credentials_from_env():
@@ -19,22 +18,6 @@ def get_sheet(sheet_name, tab_name):
     client = gspread.authorize(creds)
     return client.open(sheet_name).worksheet(tab_name)
 
-# === SCRAPE DESCRIPTION ===
-def fetch_description(url):
-    try:
-        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
-        soup = BeautifulSoup(response.text, "html.parser")
-
-        # This selector is specific to fractionaljobs.io
-        container = soup.select_one(".job-detail_description")
-
-        if container:
-            return container.get_text(separator="\n", strip=True)
-        else:
-            return "No description found"
-    except Exception as e:
-        return f"Error: {e}"
-
 # === MAIN FUNCTION ===
 def enrich_descriptions():
     sheet = get_sheet("jobscraper", "Jobs")
@@ -46,7 +29,7 @@ def enrich_descriptions():
     print(f"[INFO] Fetching descriptions for {len(urls)} URLs...")
 
     for i, url in enumerate(urls):
-        desc = fetch_description(url)
+        desc = grab_fractional_description(url)
         descriptions.append([desc])
         print(f"[{i+1}/{len(urls)}] Got description from {url}")
 
