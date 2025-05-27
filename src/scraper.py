@@ -19,7 +19,8 @@ if __name__ == "__main__":
 
     # Add UTC timestamp to all jobs
     for job in all_jobs:
-        job["date_posted"] = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
+        from datetime import timezone
+        job["date_posted"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
 
     write_jobs_to_sheet(
         jobs=all_jobs,
