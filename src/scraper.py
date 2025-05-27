@@ -23,7 +23,6 @@ if __name__ == "__main__":
 
     write_jobs_to_sheet(
         jobs=all_jobs,
-        creds_path="creds/gsheets-creds.json",
         sheet_name="jobscraper",
         tab_name="Jobs"
     )
