@@ -7,51 +7,40 @@ def scrape_wwr():
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-        page = context.new_page()
+        page = browser.new_page()
         print("[WWR] Navigating to page...")
         page.goto("https://weworkremotely.com/", timeout=60000)
-        page.wait_for_selector("section.jobs", timeout=10000)
+        page.wait_for_timeout(3000)
         html = page.content()
         browser.close()
 
     soup = BeautifulSoup(html, "html.parser")
-    sections = soup.select("section.jobs")
+    listings = soup.select("li.new-listing-container")
+    print(f"[WWR] Found {len(listings)} job <li> elements")
 
-    print(f"[WWR] Found {len(sections)} job sections")
+    for li in listings:
+        try:
+            link_tag = li.find("a", href=True)
+            job_url = "https://weworkremotely.com" + link_tag["href"] if link_tag else None
 
-    for section in sections:
-        category = section.select_one("h2")
-        category_name = category.text.strip() if category else "Unknown"
+            title_tag = li.select_one("h4.new-listing__header__title")
+            company_tag = li.select_one("p.new-listing__company-name")
+            region_tag = li.select_one("p.new-listing__company-headquarters")
 
-        listings = section.select("li:not(.view-all)")  # skip 'view all' links
-        print(f"[WWR] Found {len(listings)} listings in category '{category_name}'")
-
-        for li in listings:
-            try:
-                link_tag = li.find("a", href=True)
-                if not link_tag:
-                    continue
-                job_url = "https://weworkremotely.com" + link_tag["href"]
-
-                title_tag = li.find("span", class_="title")
-                company_tag = li.find("span", class_="company")
-                region_tag = li.find("span", class_="region")
-
-                if not title_tag or not company_tag:
-                    continue
-
-                jobs.append({
-                    "title": title_tag.text.strip(),
-                    "company": company_tag.text.strip(),
-                    "region": region_tag.text.strip() if region_tag else "Unknown",
-                    "url": job_url,
-                    "source": "weworkremotely",
-                    "category": category_name
-                })
-            except Exception as e:
-                print(f"[WWR] Error parsing listing: {e}")
+            if not all([job_url, title_tag, company_tag]):
                 continue
+
+            jobs.append({
+                "title": title_tag.text.strip(),
+                "company": company_tag.text.strip(),
+                "region": region_tag.text.strip() if region_tag else "Unknown",
+                "url": job_url,
+                "source": "weworkremotely"
+            })
+
+        except Exception as e:
+            print(f"[WWR] Error parsing listing: {e}")
+            continue
 
     print(f"[WWR] scrape_wwr returned {len(jobs)} jobs.")
     return jobs
