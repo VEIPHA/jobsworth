@@ -53,7 +53,8 @@ def enrich_descriptions():
     # Add/update the Description column
     col_index = len(data[0]) + 1  # write after existing columns
     sheet.update_cell(1, col_index, "description")  # write header
-    sheet.update(f"{chr(64 + col_index)}2", descriptions)
+    range_name = f"{chr(64 + col_index)}2:{chr(64 + col_index)}{len(descriptions) + 1}"
+    sheet.update(range_name=range_name, values=descriptions)
 
 if __name__ == "__main__":
     enrich_descriptions()
