@@ -39,15 +39,16 @@ def scrape_wwr():
 
     for li in listings:
         try:
-            job_link = li.select_one("a[href*='/remote-jobs/']")
-            job_url = f"https://weworkremotely.com{job_link['href']}" if job_link else None
-            print(f"[WWR] Found job URL: {job_url}")  # Debug line
+            link_tag = li.find("a", href=True)
+            job_url = f"https://weworkremotely.com{link_tag['href']}" if link_tag and link_tag['href'] else None
+            print(f"[WWR] Found job URL: {job_url}")
 
             title_tag = li.select_one("h4.new-listing__header__title")
             company_tag = li.select_one("p.new-listing__company-name")
             region_tag = li.select_one("p.new-listing__company-headquarters")
 
             if not all([job_url, title_tag, company_tag]):
+                print("[WWR] Skipping listing due to missing info.")
                 continue
 
             jobs.append({
