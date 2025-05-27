@@ -39,8 +39,8 @@ def scrape_wwr():
 
     for li in listings:
         try:
-            link_tag = li.find("a", href=True)
-            job_url = "https://weworkremotely.com" + link_tag["href"] if link_tag else None
+            job_link = li.select_one("a[href^='/remote-jobs/']")
+            job_url = "https://weworkremotely.com" + job_link["href"] if job_link else None
 
             title_tag = li.select_one("h4.new-listing__header__title")
             company_tag = li.select_one("p.new-listing__company-name")
