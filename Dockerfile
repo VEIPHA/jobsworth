@@ -1,11 +1,11 @@
-# Use official Python base image
+# Stage 1: Base Python image
 FROM python:3.12-slim
 
-# Set environment variables
+# Environment setup
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Install system dependencies
+# Install system dependencies first (cached unless changed)
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
@@ -35,15 +35,16 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /app
 
-# Install Python dependencies
+# Install Python & Playwright dependencies (cached if requirements.txt unchanged)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app files
-COPY . .
+# Install Playwright separately and cache it
+RUN pip install --no-cache-dir playwright && \
+    playwright install --with-deps
 
-# Install Playwright and its browsers
-RUN pip install playwright && playwright install --with-deps
+# Copy remaining app files (only triggers rebuild if files changed)
+COPY . .
 
 # Start script
 CMD ["python", "-m", "src.scraper"]
