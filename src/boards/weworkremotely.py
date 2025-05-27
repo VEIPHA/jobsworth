@@ -6,23 +6,20 @@ def scrape_wwr():
     jobs = []
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
+        browser = p.chromium.launch(headless=False)  # Set to False temporarily for debugging
+        context = browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            viewport={'width': 1280, 'height': 800},
+            locale='en-US'
+        )
+        page = context.new_page()
         print("[WWR] Navigating to page...")
         page.goto("https://weworkremotely.com/", timeout=60000)
 
-        # Wait for job listings to appear (adjust if needed)
-        try:
-            page.wait_for_selector("li.new-listing-container", timeout=10000)
-        except Exception as e:
-            print(f"[WWR] Timeout waiting for job listings: {e}")
-
+        # Cloudflare may take 3-5 seconds to clear challenge
+        page.wait_for_timeout(7000)
         html = page.content()
         browser.close()
-
-    # Optional: dump partial HTML to debug
-    print("[WWR] Dumping first 2000 characters of HTML...")
-    print(html[:2000])
 
     soup = BeautifulSoup(html, "html.parser")
     listings = soup.select("li.new-listing-container")
@@ -30,14 +27,14 @@ def scrape_wwr():
 
     for li in listings:
         try:
-            a_tag = li.find("a", href=True)
-            job_url = f"https://weworkremotely.com{a_tag['href']}" if a_tag else None
+            link_tag = li.find("a", href=True)
+            job_url = "https://weworkremotely.com" + link_tag["href"] if link_tag else None
 
             title_tag = li.select_one("h4.new-listing__header__title")
             company_tag = li.select_one("p.new-listing__company-name")
             region_tag = li.select_one("p.new-listing__company-headquarters")
 
-            if not (job_url and title_tag and company_tag):
+            if not all([job_url, title_tag, company_tag]):
                 continue
 
             jobs.append({
@@ -49,10 +46,8 @@ def scrape_wwr():
             })
 
         except Exception as e:
-            print(f"[WWR] Error parsing job listing: {e}")
+            print(f"[WWR] Error parsing listing: {e}")
             continue
 
     print(f"[WWR] scrape_wwr returned {len(jobs)} jobs.")
-    if jobs:
-        print("[WWR] Example job:", jobs[0])
     return jobs
