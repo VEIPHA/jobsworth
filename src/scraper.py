@@ -1,3 +1,4 @@
+print("[INFO] Starting scraper...")
 from datetime import datetime
 from src.boards.fractionaljobs import scrape_fractionaljobs
 from src.boards.weworkremotely import scrape_wwr
