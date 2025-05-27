@@ -1,17 +1,19 @@
-import requests
-from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
 
 def scrape_wwr():
-    url = "https://weworkremotely.com/"
-    headers = {"User-Agent": "Mozilla/5.0"}
-    response = requests.get(url, headers=headers)
-    soup = BeautifulSoup(response.text, "html.parser")
-
-    listings = soup.select("li.new-listing-container")
-
-    print(f"Found {len(listings)} job <li> elements")
-
     jobs = []
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        page.goto("https://weworkremotely.com/")
+        content = page.content()
+        browser.close()
+
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(content, "html.parser")
+    listings = soup.select("li.new-listing-container")
+    print(f"Found {len(listings)} job <li> elements")
 
     for li in listings:
         link_tag = li.find("a", href=True)
