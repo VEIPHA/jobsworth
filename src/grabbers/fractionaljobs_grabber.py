@@ -24,9 +24,11 @@ def grab_fractional_description(job_url: str) -> str:
         with open("fractional_debug.html", "w", encoding="utf-8") as f:
             f.write(html)
 
-        desc_container = soup.select_one("div.w-richtext")
+        # Corrected selector based on real HTML
+        desc_container = soup.select_one("div.job-description")
+
         if not desc_container:
-            print("[DESC] ❌ 'div[data-controller=\"job-description\"]' not found.")
+            print("[DESC] ❌ 'div.job-description' not found.")
             print("[DESC] Dumping first 1000 characters of HTML:\n")
             print(html[:1000])
             return "No description found"
