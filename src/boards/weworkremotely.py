@@ -25,7 +25,7 @@ def scrape_wwr():
             page.wait_for_selector("li.new-listing-container", timeout=10000)
         except Exception as e:
             print(f"[WWR] Timeout waiting for job listings: {e}")
-            print("[WWR] Dumping first 2000 characters of HTML...")
+            print("[WWR] Dumping partial HTML...")
             print(page.content()[:2000])
             browser.close()
             return []
@@ -35,12 +35,13 @@ def scrape_wwr():
 
     soup = BeautifulSoup(html, "html.parser")
     listings = soup.select("li.new-listing-container")
+
     print(f"[WWR] Found {len(listings)} job <li> elements")
 
     for li in listings:
         try:
-            link_tag = li.find("a", href=True)
-            job_url = "https://weworkremotely.com" + link_tag["href"] if link_tag else None
+            anchor = li.select_one("a[href^='/listings/']")
+            job_url = f"https://weworkremotely.com{anchor['href']}" if anchor else None
 
             title_tag = li.select_one("h4.new-listing__header__title")
             company_tag = li.select_one("p.new-listing__company-name")
