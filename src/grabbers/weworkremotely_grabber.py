@@ -9,15 +9,18 @@ def grab_wwr_description(job_url: str) -> str:
             page = browser.new_page()
             page.goto(job_url, timeout=60000)
 
+            # Let JS content load
             page.wait_for_timeout(3000)
+
             html = page.content()
             browser.close()
 
         soup = BeautifulSoup(html, "html.parser")
 
-        desc_container = soup.select_one("div.listing-container")
+        desc_container = soup.select_one("div.lis-container__job__content")
+
         if not desc_container:
-            print("[DESC] ❌ '.listing-container' not found.")
+            print("[DESC] ❌ '.lis-container__job__content' not found.")
             print("[DESC] Dumping first 1000 characters of HTML:\n")
             print(html[:1000])
             return "No description found"
@@ -27,5 +30,5 @@ def grab_wwr_description(job_url: str) -> str:
         return text
 
     except Exception as e:
-        print(f"[DESC] ❗ Error fetching description from {job_url}: {e}")
+        print(f"[DESC] ❗ Error fetching WWR description: {e}")
         return "No description found"
