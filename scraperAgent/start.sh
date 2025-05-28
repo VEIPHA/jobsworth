@@ -1,7 +1,7 @@
 #!/bin/bash
 
-echo "[start.sh] Running Python scraper..."
-python3 -m src.scraper
+echo "[start.sh] Scraping all job listings..."
+python3 -m scraperAgent.src.scraper
 
-echo "[start.sh] Enriching descriptions..."
-python3 -m src.description_grabber
+echo "[start.sh] Grabbing descriptions from URLs..."
+python3 -m scraperAgent.src.description_grabber
