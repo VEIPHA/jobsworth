@@ -2,6 +2,7 @@ import os
 import json
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+
 from src.grabbers.fractionaljobs_grabber import grab_fractional_description
 
 # === AUTH ===
@@ -18,24 +19,34 @@ def get_sheet(sheet_name, tab_name):
     client = gspread.authorize(creds)
     return client.open(sheet_name).worksheet(tab_name)
 
+# === SOURCE DISPATCH ===
+def fetch_description(url: str, source: str) -> str:
+    if source == "fractionaljobs":
+        return grab_fractional_description(url)
+    
+    print(f"[SKIP] Source '{source}' is not yet configured for enrichment.")
+    return "Not processed"
+
 # === MAIN FUNCTION ===
 def enrich_descriptions():
     sheet = get_sheet("jobscraper", "Jobs")
     data = sheet.get_all_records()
 
-    urls = [row["url"] for row in data]
+    print(f"[INFO] Processing {len(data)} rows from sheet...")
+
     descriptions = []
 
-    print(f"[INFO] Fetching descriptions for {len(urls)} URLs...")
+    for i, row in enumerate(data):
+        url = row.get("url")
+        source = row.get("source", "").lower()
 
-    for i, url in enumerate(urls):
-        desc = grab_fractional_description(url)
+        desc = fetch_description(url, source)
         descriptions.append([desc])
-        print(f"[{i+1}/{len(urls)}] Got description from {url}")
+        print(f"[{i+1}/{len(data)}] Processed {source} – {url}")
 
     # Add/update the Description column
-    col_index = len(data[0]) + 1  # write after existing columns
-    sheet.update_cell(1, col_index, "description")  # write header
+    col_index = len(data[0]) + 1  # assumes no existing description col
+    sheet.update_cell(1, col_index, "description")
     range_name = f"{chr(64 + col_index)}2:{chr(64 + col_index)}{len(descriptions) + 1}"
     sheet.update(range_name=range_name, values=descriptions)
 
