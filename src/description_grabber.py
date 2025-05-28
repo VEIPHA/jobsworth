@@ -4,6 +4,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 from src.grabbers.fractionaljobs_grabber import grab_fractional_description
+from src.grabbers.weworkremotely_grabber import grab_wwr_description
 
 # === AUTH ===
 def get_credentials_from_env():
@@ -23,7 +24,9 @@ def get_sheet(sheet_name, tab_name):
 def fetch_description(url: str, source: str) -> str:
     if source == "fractionaljobs":
         return grab_fractional_description(url)
-    
+    elif source == "weworkremotely":
+        return grab_wwr_description(url)
+
     print(f"[SKIP] Source '{source}' is not yet configured for enrichment.")
     return "Not processed"
 
