@@ -9,19 +9,26 @@ def grab_fractional_description(job_url: str) -> str:
             page = browser.new_page()
             page.goto(job_url, timeout=60000)
 
-            # Give JS time to run
-            page.wait_for_timeout(3000)
+            # Wait for the actual description container to load
+            try:
+                page.wait_for_selector(".text-rich-text.w-richtext", timeout=10000)
+            except Exception:
+                print("[DESC] ❌ Timed out waiting for description container.")
+                html = page.content()
+                print(html[:1000])
+                browser.close()
+                return "No description found"
 
             html = page.content()
             browser.close()
 
         soup = BeautifulSoup(html, "html.parser")
 
-        # Corrected selector based on real HTML
-        desc_container = soup.select_one("section.content12_component .text-rich-text.w-richtext")
+        # Use correct selector found in DevTools
+        desc_container = soup.select_one(".text-rich-text.w-richtext")
 
         if not desc_container:
-            print("[DESC] ❌ 'div.job-description' not found.")
+            print("[DESC] ❌ '.text-rich-text.w-richtext' not found.")
             print("[DESC] Dumping first 1000 characters of HTML:\n")
             print(html[:1000])
             return "No description found"
