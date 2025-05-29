@@ -8,14 +8,14 @@ def main():
     jobs = read_raw_jobs()
     print(f"[ENRICH] Loaded {len(jobs)} raw jobs")
 
-   for job in jobs:
-    if not isinstance(job, dict):
-        print(f"[ENRICH ERROR] Skipping invalid job: {type(job)} - {job}")
-        continue  # skip to the next one
+    for job in jobs:
+        if not isinstance(job, dict):
+            print(f"[ENRICH ERROR] Skipping invalid job: {type(job)} - {job}")
+            continue
 
-    enriched = enrich_job_row(job)
-    if enriched:
-        write_enriched_job_to_postgres(enriched)
+        enriched = enrich_job_row(job)
+        if enriched:
+            write_enriched_job_to_postgres(enriched)
 
     print("[ENRICH] EnrichmentAgent finished")
 
