@@ -1,10 +1,10 @@
-import openai
 import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def call_openai_chat(prompt):
-    openai.api_key = os.getenv("OPENAI_API_KEY")
-
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
