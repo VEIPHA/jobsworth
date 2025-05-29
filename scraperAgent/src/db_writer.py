@@ -9,8 +9,8 @@ def write_job_to_postgres(job):
         insert_query = """
         INSERT INTO raw_jobs (
             job_title, company_name, region, job_url,
-            source, timestamp, date_posted, raw_description
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            source, timestamp, raw_description
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
 
         cursor.execute(insert_query, (
