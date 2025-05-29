@@ -1,8 +1,10 @@
 print("[INFO] Starting scraper...", flush=True)
+
 from datetime import datetime, timezone
 from src.boards.fractionaljobs import scrape_fractionaljobs
 from src.boards.weworkremotely import scrape_wwr
 from src.google_sheets import write_jobs_to_sheet
+from src.db_writer import write_job_to_postgres  
 
 def run_all_scrapers():
     jobs = []
@@ -21,6 +23,7 @@ if __name__ == "__main__":
 
     for job in all_jobs:
         job["date_posted"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+        write_job_to_postgres(job)  
 
     print(f"[INFO] Writing {len(all_jobs)} jobs to sheet...", flush=True)
 
