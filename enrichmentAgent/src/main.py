@@ -8,16 +8,22 @@ def main():
     jobs = read_raw_jobs()
     print(f"[ENRICH] Loaded {len(jobs)} raw jobs")
 
-    for job in jobs:
+    for idx, job in enumerate(jobs, 1):
         if not isinstance(job, dict):
-            print(f"[ENRICH ERROR] Skipping invalid job: {type(job)} - {job}")
+            print(f"[ENRICH ERROR] Skipping invalid job at index {idx}: {type(job)} - {job}")
             continue
 
-        enriched = enrich_job_row(job)
-        if enriched:
-            write_enriched_job_to_postgres(enriched)
+        print(f"[ENRICH] → [{idx}/{len(jobs)}] Enriching job: {job.get('job_title', 'Unknown Title')}")
 
-    print("[ENRICH] EnrichmentAgent finished")
+        enriched = enrich_job_row(job)
+
+        if enriched:
+            print(f"[ENRICH] ✅ Enriched job: {enriched['cleaned_job_title']} | Rarity: {enriched['rarity']} | Salary: {enriched['estimated_salary']}")
+            write_enriched_job_to_postgres(enriched)
+        else:
+            print(f"[ENRICH ERROR] ❌ Failed to enrich job: {job.get('job_title', 'Unknown Title')}")
+
+    print("[ENRICH] EnrichmentAgent finished.")
 
 if __name__ == "__main__":
     main()
