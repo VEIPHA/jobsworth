@@ -1,4 +1,5 @@
 import datetime
+import json
 from src.utils.openai_client import call_openai_chat
 
 def enrich_job_row(job):
@@ -24,7 +25,8 @@ Raw Description:
     result = call_openai_chat(prompt)
 
     try:
-        enriched = result.json() if hasattr(result, "json") else result
+        enriched = json.loads(result)  # force parse string to dict
+
         return {
             "cleaned_job_title": enriched["cleaned_job_title"],
             "company_name": job["company_name"],
