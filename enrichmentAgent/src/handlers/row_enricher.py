@@ -35,7 +35,7 @@ Raw Description:
             "source": job["source"],
             "region": job["region"],
             "estimated_salary": enriched["estimated_salary"],
-            "rarity": enriched["rarity"],
+            "rarity": int(enriched["rarity"]),
             "created_at": datetime.datetime.utcnow().date().isoformat(),
         }
 
