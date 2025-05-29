@@ -20,7 +20,6 @@ def write_job_to_postgres(job):
             job["url"],
             job["source"],
             job["timestamp"],
-            job["date_posted"],
             job.get("description", "")
         ))
 
