@@ -1,6 +1,7 @@
 import os
 import json
 import gspread
+import psycopg2
 from oauth2client.service_account import ServiceAccountCredentials
 
 from src.grabbers.fractionaljobs_grabber import grab_fractional_description
@@ -30,6 +31,27 @@ def fetch_description(url: str, source: str) -> str:
     print(f"[SKIP] Source '{source}' is not yet configured for enrichment.")
     return "Not processed"
 
+# === DB WRITER ===
+def write_description_to_postgres(url, description):
+    try:
+        conn = psycopg2.connect(os.getenv("PG_CONN_STRING"))
+        cursor = conn.cursor()
+
+        update_query = """
+        UPDATE raw_jobs
+        SET raw_description = %s
+        WHERE job_url = %s
+        """
+
+        cursor.execute(update_query, (description, url))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        print(f"[DB] ✅ Description written to Postgres for: {url}")
+
+    except Exception as e:
+        print(f"[DB] ❌ Failed to update Postgres for {url}: {e}")
+
 # === MAIN FUNCTION ===
 def enrich_descriptions():
     sheet = get_sheet("jobscraper", "Jobs")
@@ -37,21 +59,17 @@ def enrich_descriptions():
 
     print(f"[INFO] Processing {len(data)} rows from sheet...")
 
-    descriptions = []
+    col_index = len(data[0]) + 1  # assumes no existing description col
+    sheet.update_cell(1, col_index, "raw_description")
 
     for i, row in enumerate(data):
         url = row.get("url")
         source = row.get("source", "").lower()
 
         desc = fetch_description(url, source)
-        descriptions.append([desc])
+        sheet.update_cell(i + 2, col_index, desc)
+        write_description_to_postgres(url, desc)
         print(f"[{i+1}/{len(data)}] Processed {source} – {url}")
-
-    # Add/update the Description column
-    col_index = len(data[0]) + 1  # assumes no existing description col
-    sheet.update_cell(1, col_index, "description")
-    range_name = f"{chr(64 + col_index)}2:{chr(64 + col_index)}{len(descriptions) + 1}"
-    sheet.update(range_name=range_name, values=descriptions)
 
 if __name__ == "__main__":
     enrich_descriptions()
