@@ -22,7 +22,6 @@ if __name__ == "__main__":
     all_jobs = run_all_scrapers()
 
     for job in all_jobs:
-        job["date_posted"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
         write_job_to_postgres(job)  
 
     print(f"[INFO] Writing {len(all_jobs)} jobs to sheet...", flush=True)
