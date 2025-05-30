@@ -7,7 +7,7 @@ def read_raw_jobs():
         conn = psycopg2.connect(os.getenv("PG_CONN_STRING"))
         cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        cursor.execute("SELECT * FROM raw_jobs ORDER BY id DESC LIMIT 100")  # tweakable
+        cursor.execute("SELECT * FROM raw_jobs ORDER BY id DESC")
         jobs = cursor.fetchall()
 
         cursor.close()
