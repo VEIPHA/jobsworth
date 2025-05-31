@@ -1,11 +1,14 @@
 import sys
 import os
 from .vectorize_client import push_vector_to_cf
-import openai
+from openai import OpenAI
 from dotenv import load_dotenv
 
 # Load Railway/Local .env if running locally (optional)
 load_dotenv()
+
+# Instantiate the new OpenAI client
+client = OpenAI()
 
 # ---- Dummy job data ----
 job_id = "test-job-001"
@@ -14,8 +17,8 @@ title = "Product Manager"
 company = "ExampleCo"
 url = "https://example.com/jobs/001"
 
-# ---- Generate OpenAI embedding ----
-embedding = openai.Embedding.create(
+# ---- Generate OpenAI embedding using v1 client ----
+embedding = client.embeddings.create(
     model="text-embedding-3-small",
     input=description
 ).data[0].embedding
