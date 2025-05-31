@@ -1,4 +1,4 @@
-from services.vectorize_client import push_vector_to_cf
+from src.services.vectorize_client import push_vector_to_cf
 import openai
 import os
 from dotenv import load_dotenv
