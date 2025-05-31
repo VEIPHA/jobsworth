@@ -7,13 +7,19 @@ def read_raw_jobs():
         conn = psycopg2.connect(os.getenv("PG_CONN_STRING"))
         cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        cursor.execute("SELECT * FROM raw_jobs ORDER BY id DESC")
+        cursor.execute("""
+            SELECT * FROM raw_jobs
+            WHERE job_url NOT IN (
+                SELECT job_url FROM enriched_jobs
+            )
+            ORDER BY id DESC
+        """)
         jobs = cursor.fetchall()
 
         cursor.close()
         conn.close()
 
-        print(f"[DB] ✅ Loaded {len(jobs)} raw jobs from Postgres")
+        print(f"[DB] ✅ Loaded {len(jobs)} new raw jobs from Postgres")
         return jobs
 
     except Exception as e:
