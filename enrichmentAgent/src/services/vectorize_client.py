@@ -14,6 +14,7 @@ def push_vector_to_cf(vector_id, vector, metadata):
             "metadata": metadata
         }]
     }
+    print("[DEBUG] URL:", url)
     response = requests.post(url, headers=headers, json=payload)
     response.raise_for_status()
     return response.json()
