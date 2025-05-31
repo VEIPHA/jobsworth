@@ -1,4 +1,6 @@
-from src.services.vectorize_client import push_vector_to_cf
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from services.vectorize_client import push_vector_to_cf
 import openai
 import os
 from dotenv import load_dotenv
