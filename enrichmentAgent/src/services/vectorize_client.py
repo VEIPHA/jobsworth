@@ -2,11 +2,11 @@ import os
 import requests
 
 def push_vector_to_cf(vector_id, vector, metadata):
-    url = f"https://api.cloudflare.com/client/v4/accounts/{os.environ['CF_VECTORIZE_ACCOUNT_ID']}/ai/vectorize/indexes/{os.environ['CF_VECTORIZER_INDEX_NAME']}/vectors"
-    headers = {
-        "Authorization": f"Bearer {os.environ['CF_VECTORIZE_API_KEY']}",
-        "Content-Type": "application/json"
-    }
+    url = f"https://api.cloudflare.com/client/v4/accounts/{os.environ['CF_VECTORIZE_ACCOUNT_ID']}/vectorize/indexes/{os.environ['CF_VECTORIZE_INDEX_NAME']}/vectors"
+headers = {
+    "Authorization": f"Bearer {os.environ['CF_VECTORIZE_API_KEY']}",
+    "Content-Type": "application/json"
+}
     payload = {
         "vectors": [{
             "id": str(vector_id),
