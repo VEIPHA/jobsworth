@@ -1,6 +1,6 @@
 import sys
 import os
-from services.vectorize_client import push_vector_to_cf
+from .vectorize_client import push_vector_to_cf
 import openai
 from dotenv import load_dotenv
 
